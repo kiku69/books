@@ -1,30 +1,8 @@
 <?php
 
-$host = 'd124553.mysql.zonevs.eu';
-$db   = 'd124553_bookstore';
-$user = 'd124553_book';
-$pass = 'mingisugunebook';
-$charset = 'utf8mb4';
+require_once('./connection.php');
 
-$host = 'localhost';
-$db   = 'd124553_bookstore';
-$user = 'root';
-$pass = '';
-
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
-$pdo = new PDO($dsn, $user, $pass, $options);
-
-$stmt = $pdo->query('SELECT * FROM books');
-
-while ($row = $stmt->fetch())
-{
-    echo $row['title'] . "<br>";
-}
+$stmt = $pdo->query('SELECT * FROM books WHERE is_deleted = 0');
 
 ?>
 
@@ -36,6 +14,18 @@ while ($row = $stmt->fetch())
     <title>Document</title>
 </head>
 <body>
+
+<ul>
+    <?php while ( $book = $stmt->fetch() ) { ?>
+        
+        <li>
+            <a href="./book.php?id=<?= $book['id']; ?>">
+                <?= $book['title']; ?>
+            </a>
+        </li>
+    
+    <?php } ?>
+</ul>
 
 </body>
 </html>

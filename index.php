@@ -1,8 +1,9 @@
+
 <?php
 
 require_once('./connection.php');
 
-$stmt = $pdo->query('SELECT * FROM books WHERE is_deleted = 0');
+$stmt = $pdo->query('SELECT id, title FROM books WHERE is_deleted = 0;');
 
 ?>
 
@@ -17,13 +18,11 @@ $stmt = $pdo->query('SELECT * FROM books WHERE is_deleted = 0');
 
 <ul>
     <?php while ( $book = $stmt->fetch() ) { ?>
-        
         <li>
             <a href="./book.php?id=<?= $book['id']; ?>">
                 <?= $book['title']; ?>
             </a>
         </li>
-    
     <?php } ?>
 </ul>
 

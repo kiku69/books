@@ -1,14 +1,20 @@
+
 <?php
 
 require_once('./connection.php');
 
 $id = $_GET['id'];
 
-if ( isset($_POST['action']) && $_POST['action'] == 'Salvesta' ){
-    $stmt = $pdo->prepare('UPDATE books SET title, price = :price WHERE id = :id');
-    $stmt->execute(['id' => $id, 'title' => $_POST['title'] ]);
+if ( isset($_POST['submit_book']) && $_POST['submit_book'] == 'Save' ) {
+    
+    $stmt = $pdo->prepare('UPDATE books SET title = :title WHERE id = :id');
+    $stmt->execute([
+        'id' => $id,
+        'title' => $_POST['title']
+    ]);
 
-    header("Location: ./book.php?id={ $id }");
+    header('Location: ./book.php?id=' . $id);
+
 }
 
 $stmt = $pdo->prepare('SELECT * FROM books WHERE id = :id');
@@ -26,15 +32,17 @@ $book = $stmt->fetch();
 </head>
 <body>
 
-    <form action="./edit.php?id=<?= $id; ?>" method="post">
-        <label>Pealkiri:</label>
-        <input type="text" name="title" value="<?= $book['title'];?>">
+    <form action="./edit.php?id=<?= $book['id']; ?>" method="post">
+        <input type="hidden" name="id" value="<?= $book['id']; ?>">
+        <input type="text" name="title" value="<?= $book['title']; ?>" style="width: 240px;">
         <br><br>
-        <label>Hind:</label>
-        <input type="text" name="price" value="<?= $book['price'];?>">
-        <br>
-        <input type="submit" name="action" value="Salvesta">
+        <input type="submit" name="submit_book" value="Save">
     </form>
-    
+
+
+    <br><br>
+    <a href="./book.php?id=<?= $book['id']; ?>">
+        cancel
+    </a>
 </body>
 </html>

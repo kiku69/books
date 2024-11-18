@@ -1,11 +1,14 @@
-
 <?php
 
 require_once('./connection.php');
 
-$id = $_POST['id'];
+if ( isset($_POST['action']) && $_POST['action'] == 'Kustuta' ) {
 
-$stmt = $pdo->prepare('UPDATE books SET is_deleted = 1 WHERE id = :id');
-$stmt->execute(['id' => $id]);
+    $id = $_POST['id'];
 
-header('Location: ./index.php');
+    $stmt = $pdo->prepare('UPDATE books SET is_deleted = 1 WHERE id = :id');
+    $stmt->execute(['id' => $id]);
+
+    header("Location: ./index.php");
+
+}

@@ -9,11 +9,11 @@ $stmt = $pdo->prepare('SELECT * FROM books WHERE id = :id');
 $stmt->execute(['id' => $id]);
 $book = $stmt->fetch();
 
-// get book auhtors
+// get book authors
 $bookAuthorsStmt = $pdo->prepare('SELECT * FROM book_authors ba LEFT JOIN authors a ON ba.author_id=a.id WHERE ba.book_id = :id');
 $bookAuthorsStmt->execute(['id' => $id]);
 
-// get available auhtors
+// get available authors
 $availableAuthorsStmt = $pdo->prepare('SELECT * FROM authors WHERE id NOT IN (SELECT author_id FROM book_authors WHERE book_id = :book_id)');
 $availableAuthorsStmt->execute(['book_id' => $id]);
 
@@ -24,72 +24,80 @@ $availableAuthorsStmt->execute(['book_id' => $id]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Edit Book</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 font-sans text-gray-800">
 
-    <nav>
-        <a href="./book.php?id=<?= $id; ?>">Tagasi</a>
+<div class="container mx-auto py-8 px-4">
+    <nav class="mb-6">
+        <a href="./book.php?id=<?= $id; ?>" 
+           class="text-blue-500 hover:underline">&larr; Back</a>
     </nav>
-    <br>
 
-    <h3><?= $book['title'];?></h3>
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
+        <h3 class="text-2xl font-bold text-gray-900 mb-4"><?= htmlspecialchars($book['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
 
-    <form action="./update_book.php?id=<?= $id; ?>" method="post">
-        <label for="title">Pealkiri:</label>
-        <input type="text" name="title" value="<?= $book['title'];?>">
-        <br>
-        <label for="price">Hind:</label>
-        <input type="text" name="price" value="<?= $book['price'];?>">
-        <br><br>
-        <input type="submit" name="action" value="Salvesta">
-    </form>
-   
-<br><br>
+        <form action="./update_book.php?id=<?= $id; ?>" method="post" class="space-y-4">
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700">Title:</label>
+                <input type="text" id="title" name="title" value="<?= htmlspecialchars($book['title'], ENT_QUOTES, 'UTF-8'); ?>" 
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
 
-    <h3>Autorid:</h3>
+            <div>
+                <label for="price" class="block text-sm font-medium text-gray-700">Price:</label>
+                <input type="text" id="price" name="price" value="<?= htmlspecialchars($book['price'], ENT_QUOTES, 'UTF-8'); ?>" 
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
 
-    <ul>
-        <?php while ( $author = $bookAuthorsStmt->fetch() ) { ?>
-            
-            <li>
-                <form action="./remove_author.php?id=<?= $id; ?>" method="post">
-                    <?= $author['first_name']; ?>
-                    <?= $author['last_name']; ?>
-                    <button type="submit" name="action" value="remove_auhtor" style="cursor: pointer; border: 0; background-color: inherit; margin-left: 16px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 24 24" style="vertical-align: text-top;">
-                            <path d="M 10.806641 2 C 10.289641 2 9.7956875 2.2043125 9.4296875 2.5703125 L 9 3 L 4 3 A 1.0001 1.0001 0 1 0 4 5 L 20 5 A 1.0001 1.0001 0 1 0 20 3 L 15 3 L 14.570312 2.5703125 C 14.205312 2.2043125 13.710359 2 13.193359 2 L 10.806641 2 z M 4.3652344 7 L 5.8925781 20.263672 C 6.0245781 21.253672 6.877 22 7.875 22 L 16.123047 22 C 17.121047 22 17.974422 21.254859 18.107422 20.255859 L 19.634766 7 L 4.3652344 7 z"></path>
-                        </svg>
-                    </button>
-                    <input type="hidden" name="author_id" value="<?= $author['id']; ?>">
-                </form>
-            </li>
-        
-        <?php } ?>
-    </ul>
+            <div>
+                <button type="submit" name="action" value="Salvesta" 
+                        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
 
-    <form action="./add_author.php" method="post">
+    <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto mt-8">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Authors:</h3>
 
-        <input type="hidden" name="book_id" value="<?= $id; ?>">
+        <ul class="space-y-4">
+            <?php while ($author = $bookAuthorsStmt->fetch()) { ?>
+                <li class="flex justify-between items-center border-b border-gray-200 pb-2">
+                    <span class="text-gray-700"><?= htmlspecialchars($author['first_name'], ENT_QUOTES, 'UTF-8'); ?> <?= htmlspecialchars($author['last_name'], ENT_QUOTES, 'UTF-8'); ?></span>
+                    <form action="./remove_author.php?id=<?= $id; ?>" method="post" class="flex items-center">
+                        <input type="hidden" name="author_id" value="<?= $author['id']; ?>">
+                        <button type="submit" name="action" value="remove_author" 
+                                class="text-red-500 hover:text-red-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash">
+                                <path d="M5.5 5.5v10h5v-10h-5zM14.5 3v1H1v-1h13.5zM6 5.5H5v10h1v-10zm2 10v-10H7v10h1zm2-10H9v10h1v-10z"/>
+                            </svg>
+                        </button>
+                    </form>
+                </li>
+            <?php } ?>
+        </ul>
 
-        <select name="author_id">
-    
-            <option value=""></option>
-        
-        <?php while ( $author = $availableAuthorsStmt->fetch() ) { ?>
-            <option value="<?= $author['id']; ?>">
-                <?= $author['first_name']; ?>
-                <?= $author['last_name']; ?>
-            </option>
-        <?php } ?>
-
-        </select>
-
-        <button type="submit" name="action" value="add_author">
-            Lisa autor
-        </button>
-
-    </form>
+        <form action="./add_author.php" method="post" class="mt-6 flex items-center space-x-4">
+            <input type="hidden" name="book_id" value="<?= $id; ?>">
+            <select name="author_id" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option value="" selected>Select an author</option>
+                <?php while ($author = $availableAuthorsStmt->fetch()) { ?>
+                    <option value="<?= $author['id']; ?>">
+                        <?= htmlspecialchars($author['first_name'], ENT_QUOTES, 'UTF-8'); ?> <?= htmlspecialchars($author['last_name'], ENT_QUOTES, 'UTF-8'); ?>
+                    </option>
+                <?php } ?>
+            </select>
+            <button type="submit" name="action" value="add_author" 
+                    class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                Add Author
+            </button>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>

@@ -10,7 +10,7 @@ $stmt->execute(['id' => $id]);
 $book = $stmt->fetch();
 
 // get book authors
-$bookAuthorsStmt = $pdo->prepare('SELECT * FROM book_authors ba LEFT JOIN authors a ON ba.author_id=a.id WHERE ba.book_id = :id');
+$bookAuthorsStmt = $pdo->prepare('SELECT * FROM book_authors ba LEFT JOIN authors a ON ba.author_id = a.id WHERE ba.book_id = :id');
 $bookAuthorsStmt->execute(['id' => $id]);
 
 // get available authors
@@ -32,8 +32,7 @@ $availableAuthorsStmt->execute(['book_id' => $id]);
 
 <div class="container mx-auto py-8 px-4">
     <nav class="mb-6">
-        <a href="./book.php?id=<?= $id; ?>" 
-           class="text-blue-500 hover:underline">&larr; Back</a>
+        <a href="./book.php?id=<?= $id; ?>" class="text-blue-500 hover:underline">&larr; Back</a>
     </nav>
 
     <div class="bg-white shadow-md rounded-lg p-6 max-w-2xl mx-auto">
@@ -53,7 +52,7 @@ $availableAuthorsStmt->execute(['book_id' => $id]);
             </div>
 
             <div>
-                <button type="submit" name="action" value="Salvesta" 
+                <button type="submit" name="action" value="save" 
                         class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
                     Save
                 </button>
@@ -81,16 +80,33 @@ $availableAuthorsStmt->execute(['book_id' => $id]);
             <?php } ?>
         </ul>
 
-        <form action="./add_author.php" method="post" class="mt-6 flex items-center space-x-4">
+        <form action="./add_author.php" method="post" class="mt-6 space-y-4">
             <input type="hidden" name="book_id" value="<?= $id; ?>">
-            <select name="author_id" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                <option value="" selected>Select an author</option>
-                <?php while ($author = $availableAuthorsStmt->fetch()) { ?>
-                    <option value="<?= $author['id']; ?>">
-                        <?= htmlspecialchars($author['first_name'], ENT_QUOTES, 'UTF-8'); ?> <?= htmlspecialchars($author['last_name'], ENT_QUOTES, 'UTF-8'); ?>
-                    </option>
-                <?php } ?>
-            </select>
+            
+            <!-- Select existing author -->
+            <div>
+                <label for="author_id" class="block text-sm font-medium text-gray-700">Select an existing author:</label>
+                <select name="author_id" id="author_id" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="" selected>Choose an author</option>
+                    <?php while ($author = $availableAuthorsStmt->fetch()) { ?>
+                        <option value="<?= $author['id']; ?>">
+                            <?= htmlspecialchars($author['first_name'], ENT_QUOTES, 'UTF-8'); ?> <?= htmlspecialchars($author['last_name'], ENT_QUOTES, 'UTF-8'); ?>
+                        </option>
+                    <?php } ?>
+                </select>
+            </div>
+
+            <!-- Add new author -->
+            <div>
+                <label for="new_author_first_name" class="block text-sm font-medium text-gray-700">Add a new author:</label>
+                <div class="flex space-x-4">
+                    <input type="text" name="new_author_first_name" id="new_author_first_name" placeholder="First name" 
+                           class="block w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <input type="text" name="new_author_last_name" id="new_author_last_name" placeholder="Last name" 
+                           class="block w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
             <button type="submit" name="action" value="add_author" 
                     class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
                 Add Author

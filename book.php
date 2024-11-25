@@ -11,6 +11,8 @@ $book = $stmt->fetch();
 $stmt = $pdo->prepare('SELECT * FROM book_authors ba LEFT JOIN authors a ON ba.author_id=a.id WHERE ba.book_id = :id');
 $stmt->execute(['id' => $id]);
 
+
+
 ?>
 
 <!DOCTYPE html>
@@ -19,6 +21,7 @@ $stmt->execute(['id' => $id]);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($book['title'], ENT_QUOTES, 'UTF-8'); ?></title>
+   
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -45,10 +48,15 @@ $stmt->execute(['id' => $id]);
             <?php } ?>
         </ul>
 
+        <p>Kokkuvõte: <?=$book['summary'] ?></p>
         <p class="text-lg font-medium mb-4">
             <span class="text-gray-700">Price:</span> 
             <span class="text-gray-900"><?= round($book['price'], 2); ?> &euro;</span>
         </p>
+
+        <div class="image-container">
+            <img src="<?= htmlspecialchars($book['cover_path'], ENT_QUOTES, 'UTF-8'); ?>" alt="Cover image of <?= htmlspecialchars($book['title'], ENT_QUOTES, 'UTF-8'); ?>">
+        </div>
 
         <div class="flex space-x-4">
             <a href="./edit.php?id=<?= $id; ?>" 
